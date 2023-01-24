@@ -19,7 +19,7 @@ constexpr int Size = 40;
 int Score{ 0 };
 
 namespace random {
-	mt19937 mt;
+	mt19937 mt{random_device{}()};
 
 	Vector2f randomPosition() {
 		uniform_int_distribution rand_x{ 2, 38 };
@@ -159,9 +159,7 @@ public:
 		return false;
 	}
 
-	void GameOver(RenderWindow& window) {
-		Font font;
-		Text text;
+	void GameOver(Font& font, Text& text, RenderWindow& window) {
 		font.loadFromFile("Shriftes/arial.ttf");
 		text.setFont(font);
 		text.setString("Game over");
@@ -173,6 +171,9 @@ public:
 	}
 
 	void update(RectangleShape& apple, Text& score, RenderWindow& window) {
+		
+		static Font font;
+		static Text text;
 
 		if (snake[0].position == apple.getPosition()) {
 			addPart();
@@ -181,6 +182,7 @@ public:
 		}
 
 		if (isGameOver()) {
+			GameOver(font, text, window);
 			return;
 		}
 		
