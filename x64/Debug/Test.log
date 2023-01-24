@@ -1,0 +1,5 @@
+﻿  main.cpp
+D:\Учеба\C++\Projects\Test\main.cpp(93,38): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+D:\Учеба\C++\Projects\Test\main.cpp(93,30): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+D:\Учеба\C++\Projects\Test\main.cpp(243,1): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+  Test.vcxproj -> D:\Учеба\C++\Projects\Test\x64\Debug\Test.exe
