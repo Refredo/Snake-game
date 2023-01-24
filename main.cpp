@@ -16,8 +16,6 @@ constexpr int HEIGHT = 736;
 
 constexpr int Size = 40;
 
-int Score{ 0 };
-
 namespace random {
 	mt19937 mt{random_device{}()};
 
@@ -97,12 +95,6 @@ public:
 	}
 };
 
-void createnewApple(RectangleShape& apple) {
-	apple.setPosition(random::randomPosition());
-}
-
-void updateScore(Text& score);
-
 class Game: public Drawable {
 public:
 	
@@ -118,9 +110,27 @@ public:
 		snake[0].part.setSize(Vector2f{29, 29});
 
 		direction = Move::Right;
+
+		apple.setPosition(random::randomPosition());
+		apple.setFillColor(Color::Red);
+		apple.setOutlineThickness(3);
+		apple.setOutlineColor(Color::Black);
+		apple.setSize(Vector2f{ 29, 29 });
+
+		font.loadFromFile("Shriftes/arial.ttf");
+
+		text.setFont(font);
+		text.setString("Score: 0");
+		text.setCharacterSize(24);
+		text.setFillColor(Color::White);
+		text.setPosition(1140, 705);
+
+		Score = 0;
 	}
 
 	void draw(RenderTarget& target, RenderStates states) const{
+		target.draw(apple);
+		target.draw(text);
 		for (int i = 0; i < snake.size(); i++) {
 			target.draw(snake[i].part);
 		}
@@ -136,6 +146,15 @@ public:
 		temp.part.setSize(Vector2f{ 29, 29 });
 		snake.push_back(temp);
 
+	}
+
+	void createnewApple() {
+		apple.setPosition(random::randomPosition());
+	}
+
+	void updateScore() {
+		++Score;
+		text.setString("Score: " + to_string(Score));
 	}
 
 	bool isGameOver() {
@@ -170,19 +189,19 @@ public:
 
 	}
 
-	void update(RectangleShape& apple, Text& score, RenderWindow& window) {
+	void update(RenderWindow& window) {
 		
 		static Font font;
 		static Text text;
 
 		if (snake[0].position == apple.getPosition()) {
 			addPart();
-			createnewApple(apple);
-			updateScore(score);
+			createnewApple();
+			updateScore();
 		}
 
 		if (isGameOver()) {
-			GameOver(font, text, window);
+			//GameOver(font, text, window);
 			return;
 		}
 		
@@ -251,14 +270,16 @@ private:
 
 	vector<Part> snake;
 	Move direction;
+	RectangleShape apple;
+	Font font;
+	Text text;
+	int Score;
 };
 
-void reDrawFrame(RenderWindow& window, Map& map, Game& snake, RectangleShape& apple, Text& score) {
+void reDrawFrame(RenderWindow& window, Map& map, Game& snake) {
 	window.clear(Color::White);
 	map.draw(window);
-	window.draw(apple);
 	window.draw(snake);
-	window.draw(score);
 	window.display();
 }
 
@@ -274,48 +295,18 @@ void pollEvent(RenderWindow& window) {
 	}
 }
 
-void initApple(RectangleShape& apple) {
-	apple.setPosition(random::randomPosition());
-	apple.setFillColor(Color::Red);
-	apple.setOutlineThickness(3);
-	apple.setOutlineColor(Color::Black);
-	apple.setSize(Vector2f{ 29, 29 });
-}
-
-void initScore(Text& text, Font& font) {
-	font.loadFromFile("Shriftes/arial.ttf");
-
-	text.setFont(font);
-	text.setString("Score: 0");
-	text.setCharacterSize(24);
-	text.setFillColor(Color::White);
-	text.setPosition(1140, 705);
-}
-
-void updateScore(Text& score) {
-	++Score;
-	score.setString("Score: " + to_string(Score));
-}
-
 int main() {
 	RenderWindow window(VideoMode(WEIGHT, HEIGHT), "Snake");
 
 	Map map;
-	Game snake;
-	snake.addPart();
-
-	RectangleShape apple;
-	initApple(apple);
-
-	Font font;
-	Text score;
-	initScore(score, font);
+	Game snake_game;
+	snake_game.addPart();
 
 	while (window.isOpen()) {
 
 		pollEvent(window);
-		snake.update(apple, score, window);
-		reDrawFrame(window, map, snake, apple, score);
+		snake_game.update(window);
+		reDrawFrame(window, map, snake_game);
 	}
 
 	return 0;
